@@ -1,6 +1,6 @@
+const fs = require("fs");
 const inquirer = require("inquirer");
-// const fs = require("fs");
-// const generatePage = require("./src/page-template");
+const generatePage = require("./src/page-template");
 
 // const pageHTML = generatePage(name, github);
 
@@ -39,20 +39,32 @@ const promptUser = () => {
       }
     },
     {
+      type: "confirm",
+      name: "confirmAbout",
+      message: "Would you like to enter some information about yourself for an 'About' section?",
+      default: true
+    },
+    {
       type: "input",
       name: "about",
-      nessage: "Provide some information about yourself:"
+      message: "Provide some information about yourself:",
+      when: ({confirmAbout}) => confirmAbout
     }
   ]);
 };
 
-const promptProject = () => {
-  console.log(`)
+const promptProject = portfolioData => {
+  console.log(`
 ===================
 Add a New Project
 ===================
 `);
-  return inquirer.prompt([
+
+if (!portfolioData.projects) {
+  portfolioData.projects = [];
+}
+return inquirer
+  .prompt([
     {
       type: "input",
       name: "name",
@@ -61,7 +73,7 @@ Add a New Project
         if (projectNameInput) {
           return true;
         } else {
-          console.log("Please enter the project name!");
+          console.log("You need to enter a project name!");
           return false;
         }
       }
@@ -74,7 +86,7 @@ Add a New Project
         if (projectDescriptionInput) {
           return true;
         } else {
-          console.log("Please enter a project description!");
+          console.log("You need to enter a project description!");
           return false;
         }
       }
@@ -82,7 +94,7 @@ Add a New Project
     {
       type: "checkbox",
       input: "languages",
-      message: "What did you build this project with? (Check all that apply)",
+      message: "What did you build this project with? (Check all that apply.)",
       choices: ["JavaScript", "HTML", "CSS", "ES6", "jQuery", "Bootstrap", "Node"]
     },
     {
@@ -93,7 +105,7 @@ Add a New Project
         if (linkInput) {
           return true;
         } else {
-          console.log("Please enter a project link!");
+          console.log("You need to enter a project link!");
           return false;
         }
       }
@@ -110,6 +122,7 @@ Add a New Project
       message: "Would you like to enter another project?",
       default: false
     }
+  ])
     .then(projectData => {
       portfolioData.projects.push(projectData);
       if (projectData.confirmAddProject) {
@@ -118,7 +131,6 @@ Add a New Project
         return portfolioData;
       }
     });
-  ]);
 };
 
 promptUser()
@@ -127,8 +139,3 @@ promptUser()
     console.log(portfolioData);
   });
 
-const promptProject = portfolioData => {
-  if (!portfolioData.projects) {
-    portfolioData.projects = [];
-  }
-}
